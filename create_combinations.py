@@ -49,7 +49,7 @@ def create_random_iter(array, num_items: int) -> Iterator:
                     return
 
 
-def generate_initial_combinations(num_combinations: int) -> List[Dict[str, int]]:
+def generate_smart_combinations(num_combinations: int) -> List[Dict[str, int]]:
     """Generates initial combinations for the traits."""
     sorted_traits = sorted(trait_score, key=lambda x: trait_score[x], reverse=True)
 
@@ -72,6 +72,14 @@ def generate_initial_combinations(num_combinations: int) -> List[Dict[str, int]]
         combinations.append(combination)
 
     return combinations
+
+
+def generate_random_combinations(num_combinations: int) -> List[Dict[str, int]]:
+    """Generates initial combinations for the traits."""
+    return [
+        {trait: random.randrange(trait_amounts[trait]) for trait in traits}
+        for _ in range(num_combinations)
+    ]
 
 
 def difference_score(combination1: Dict[str, int], combination2: Dict[str, int]) -> int:
@@ -113,13 +121,13 @@ def optimize_combinations(
         for i, combination in enumerate(combinations):
             new_combination = generate_neighbour(combination)
             potential_new_score = min(
-                difference_score(new_combination, combination)
-                for j, combination in enumerate(combinations)
+                difference_score(new_combination, combj)
+                for j, combj in enumerate(combinations)
                 if i != j
             )
             current_score = min(
-                difference_score(combination, combination)
-                for j, combination in enumerate(combinations)
+                difference_score(combination, combj)
+                for j, combj in enumerate(combinations)
                 if i != j
             )
             if potential_new_score > current_score:
@@ -142,6 +150,7 @@ def save_combinations(combinations: List[Dict[str, int]], filename: str):
 
 
 def execute_algorithm(
+    generation_algo,
     num_combinations: int,
     iterations: int,
     algorithm_name: str,
@@ -151,7 +160,7 @@ def execute_algorithm(
     print(algorithm_name)
 
     start = time.time()
-    initial_combinations = generate_initial_combinations(num_combinations)
+    initial_combinations = generation_algo(num_combinations)
     print_elapsed_time(start, "Found initial combinations")
 
     start = time.time()
@@ -172,12 +181,22 @@ def execute_algorithm(
 
 def main():
     """Main function to run the algorithms and print their results."""
-    num_combinations = 5
-    iterations = 5
-    execute_algorithm(num_combinations, iterations, "OPTIMIZED ALGORITHM", True)
+    num_combinations = 1000
+    iterations = 10
+    execute_algorithm(
+        generate_smart_combinations,
+        num_combinations,
+        iterations,
+        "OPTIMIZED ALGORITHM",
+        True,
+    )
     print()
     execute_algorithm(
-        num_combinations, iterations, "RANDOMIZED ALGORITHM (for comparison)", False
+        generate_random_combinations,
+        num_combinations,
+        iterations,
+        "RANDOMIZED ALGORITHM (for comparison)",
+        False,
     )
 
 
