@@ -172,7 +172,7 @@ def execute_algorithm(
 
 def main():
     """Main function to run the algorithms and print their results."""
-    num_combinations = 1000
+    num_combinations = 5
     iterations = 5
     execute_algorithm(num_combinations, iterations, "OPTIMIZED ALGORITHM", True)
     print()
